@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Daum Image Tile by Openlayers3</title>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.16.0/css/ol.css" type="text/css">
+    <script src="http://openlayers.org/en/v3.16.0/build/ol.js"></script>
+    <script src="ol-daum.js"></script>
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      var daumImgLayer = new ol.layer.Tile({
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 7,
+          maxZoom: 14,
+          maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      });
+    </script>
+  </body>
+</html>
