@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Topojson</title>
+    <title>Vector Select</title>
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.17.1/ol-debug.css" type="text/css">
@@ -19,9 +19,6 @@
     <div id="map" class="map"></div>
     <script>
       proj4.defs("EPSG:5181","+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-
-      console.log(ol.proj.get('EPSG:5181'))
-      console.log( ol.proj.fromLonLat([127,37], ol.proj.get('EPSG:5181')) )
 
       var styles = [
         new ol.style.Style({
@@ -69,23 +66,23 @@
       var layerSwitcher = new ol.control.LayerSwitcher({})
       map.addControl(layerSwitcher)
 
-      map.addInteraction(new ol.interaction.KeyboardZoom())
-    </script>
+      var selectSingleClick = new ol.interaction.Select()
+      map.addInteraction(selectSingleClick)
+      selectSingleClick.on('select', function(e) {
+        console.log( e.target )
+        console.log( e.target.getKeys() )
+        console.log( e.target.getFeatures() )
+        console.log( e.target.getFeatures().item(0) )
+        console.log( e.target.getFeatures().item(0).getKeys() )
+        console.log( e.target.getFeatures().item(0).get('HCODE') )
 
-    <!--
-    <script type="text/javascript">
-      $.getJSON( 'korea-region-topo-filtered.json', function( data ) {
-        var features = new ol.format.TopoJSON().readFeatures(data)
-
-        var layer = new ol.layer.Vector({
-          title: 'vector',
-          source: new ol.source.Vector({features: features}),
-          style: styles
-        });
-
-        map.addLayer(layer)
+        /*
+        e.target.getFeatures().forEach(function(it){
+          console.log(it)
+        })
+        */
       })
+
     </script>
-    -->
   </body>
 </html>
