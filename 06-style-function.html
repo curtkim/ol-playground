@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Popup</title>
-    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
+    <title>style function</title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.17.1/ol-debug.css" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.17.1/ol-debug.js"></script>
@@ -16,35 +13,37 @@
     <script src="ol-daum.js"></script>
     <style>
       body {margin: 0; padding: 0}
-      .popover-content {
-        min-width: 180px;
-      }
     </style>
   </head>
   <body>
     <div id="map" class="map"></div>
-    <div id="popup" title="Welcome to ol3"></div>
     <script>
       proj4.defs("EPSG:5181","+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 
-      var styles = [
-        new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'blue',
-            width: 2
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(0, 0, 255, 0.3)'
+      console.log(ol.proj.get('EPSG:5181'))
+      console.log( ol.proj.fromLonLat([127,37], ol.proj.get('EPSG:5181')) )
+
+      var customStyleFunction = function(feature, resolution) {
+        return [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: 'blue',
+              width: 2
+            }),
+            fill: new ol.style.Fill({
+              color: '#'+Math.floor(Math.random()*16777215).toString(16)
+            })
           })
-        })
-      ];
+        ]
+      }
 
       var vector = new ol.layer.Vector({
         title: 'vector',
         source: new ol.source.Vector({url: 'korea-region-topo.json', format: new ol.format.TopoJSON({
           defaultDataProjection: ol.proj.get('EPSG:5181')
         })}),
-        style: styles
+        style: customStyleFunction,
+        opacity: 0.3
       });
 
       var daumImgLayer = new ol.layer.Tile({
@@ -73,29 +72,16 @@
       var layerSwitcher = new ol.control.LayerSwitcher({})
       map.addControl(layerSwitcher)
 
-      // Popup showing the position the user clicked
-      var popup = new ol.Overlay({
-        element: document.getElementById('popup')
-      })
-      map.addOverlay(popup)
+      map.addInteraction(new ol.interaction.KeyboardZoom())
+    </script>
 
-
-      var selectSingleClick = new ol.interaction.Select()
-      map.addInteraction(selectSingleClick)
-      selectSingleClick.on('select', function(e) {
-        var coordinate = e.mapBrowserEvent.coordinate
-        var element = popup.getElement()
-        var feature = e.target.getFeatures().item(0)
-        $(element).popover('destroy')
-        popup.setPosition(coordinate)
-        $(element).popover({
-          'placement': 'top',
-          'animation': false,
-          'html': true,
-          'content': '<p>The location you clicked was:</p><div>' + feature.get('HCODE') + '</div>'
-        });
-        $(element).popover('show');
+    <!--
+    <script type="text/javascript">
+      $.getJSON( 'korea-region-topo.json', function( data ) {
+        var features = new ol.format.TopoJSON().readFeatures(data)
+        console.log(features)
       })
     </script>
+    -->
   </body>
 </html>
