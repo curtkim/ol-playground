@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ol.layer.Vector + ol.source.Vector</title>
+    <title>dynamic add/update feature</title>
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
     <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
@@ -11,19 +11,25 @@
     </style>
   </head>
   <body>
+    <button onclick='addFeature()'>add</button>
+    <button onclick='updateFeature()'>update</button>
     <div id="map" class="map"></div>
     <script>
-      var styles = [
-        new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'blue',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: 'rgba(0, 0, 255, 0.3)'
+      var customStyleFunction = function(feature, resolution) {
+        console.log( feature.get('value'))
+        //console.log( feature.getId() )
+        return [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: 'blue',
+              width: 3
+            }),
+            fill: new ol.style.Fill({
+              color: 'rgba(0, 0, ' + feature.get('value') + ', 1)'
+            })
           })
-        })
-      ];
+        ];
+      }
 
       var geojsonObject = {
         'type': 'FeatureCollection',
@@ -34,17 +40,17 @@
             'coordinates': [
               [[0, 0], [200000, 0],[100000, 100000],[0, 0]]
             ]
+          },
+          'properties': {
+            "value": 10
           }
         }]
       };
 
-      var layer = new ol.layer.Vector({
-        source: new ol.source.Vector({
-          features: (new ol.format.GeoJSON()).readFeatures(geojsonObject)
-        }),
-        style: styles
-      });
-
+      var source = new ol.source.Vector({
+        features: (new ol.format.GeoJSON()).readFeatures(geojsonObject)
+      })
+      var layer = new ol.layer.Vector({source: source,style: customStyleFunction});
 
       var daumImgLayer = new ol.layer.Tile({
         source: new ol.source.DaumImg()
@@ -66,6 +72,22 @@
           new ol.control.MousePosition()
         ]
       });
+
+
+      var features = [
+        new ol.Feature({
+          geometry: new ol.geom.Polygon([[[0, 400000],[200000, 400000],[100000, 500000],[0, 400000]]]),
+          value: 200,
+          id: 2
+        })
+      ]
+
+      function addFeature(){
+        source.addFeatures(features)
+      }
+      function updateFeature(){
+        features[0].set('value', 250)
+      }
     </script>
   </body>
 </html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>canvas gradient pattern</title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
+
+    <script src="ol-daum.js"></script>
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      proj4.defs("EPSG:5181","+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+
+      var pixelRatio = ol.has.DEVICE_PIXEL_RATIO;
+
+      // Generate a rainbow gradient
+      function gradient(feature, resolution) {
+        var extent = feature.getGeometry().getExtent();
+        // Gradient starts on the left edge of each feature, and ends on the right.
+        // Coordinate origin is the top-left corner of the extent of the geometry, so
+        // we just divide the geometry's extent width by resolution and multiply with
+        // pixelRatio to match the renderer's pixel coordinate system.
+        var x2 = ol.extent.getWidth(extent) / resolution * pixelRatio
+        console.log(ol.extent.getWidth(extent), resolution, pixelRatio, x2)
+        var grad = context.createLinearGradient(0, 0, x2 , 0);
+        grad.addColorStop(0, 'red');
+        grad.addColorStop(1 / 6, 'orange');
+        grad.addColorStop(2 / 6, 'yellow');
+        grad.addColorStop(3 / 6, 'green');
+        grad.addColorStop(4 / 6, 'aqua');
+        grad.addColorStop(5 / 6, 'blue');
+        grad.addColorStop(1, 'purple');
+        return grad;
+      }
+
+      // Generate a canvasPattern with two circles on white background
+      var pattern = (function() {
+        canvas.width = 11 * pixelRatio;
+        canvas.height = 11 * pixelRatio;
+        // white background
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        // outer circle
+        context.fillStyle = 'rgba(102, 0, 102, 0.5)';
+        context.beginPath();
+        context.arc(5 * pixelRatio, 5 * pixelRatio, 4 * pixelRatio, 0, 2 * Math.PI);
+        context.fill();
+        // inner circle
+        context.fillStyle = 'rgb(55, 0, 170)';
+        context.beginPath();
+        context.arc(5 * pixelRatio, 5 * pixelRatio, 2 * pixelRatio, 0, 2 * Math.PI);
+        context.fill();
+        return context.createPattern(canvas, 'repeat');
+      }());
+
+      var fill = new ol.style.Fill();
+      var style = new ol.style.Style({
+        fill: fill,
+        stroke: new ol.style.Stroke({
+          color: '#333',
+          width: 2
+        })
+      });
+
+      var getStackedStyle = function(feature, resolution) {
+        var id = feature.get('HCODE')
+        fill.setColor(gradient(feature, resolution)); //pattern
+        return style;
+      }
+
+      var geojsonObject = {
+        'type': 'FeatureCollection',
+        'features': [{
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [
+              [[0, 0], [200000, 0],[100000, 100000],[0, 0]]
+            ]
+          },
+          'properties': {
+            "value": 10
+          }
+        }]
+      };
+
+      var source = new ol.source.Vector({
+        features: (new ol.format.GeoJSON()).readFeatures(geojsonObject)
+      })
+
+
+      var vector = new ol.layer.Vector({
+        title: 'vector',
+        source: source,
+        style: getStackedStyle,
+        opacity: 0.3
+      });
+
+      var daumImgLayer = new ol.layer.Tile({
+        title: 'daum 2d',
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer, vector
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,241898],
+          zoom: 1,
+          maxZoom: 14,
+          maxResolution: 2048, // 14level(zoom=0)에서 1px은 2048m와 같다
+          projection: ol.proj.get('EPSG:5181')
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      });
+    </script>
+
+  </body>
+</html>
