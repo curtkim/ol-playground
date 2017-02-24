@@ -7,10 +7,13 @@
     <script src="ol-daum.js"></script>
     <style>
       body {margin: 0; padding: 0}
+      #map:focus {
+        outline: #4A74A8 solid 0.15em;
+      }
     </style>
   </head>
   <body>
-    <div id="map" class="map"></div>
+    <div id="map" class="map" tabindex="0"></div>
     <script>
       var daumImgLayer = new ol.layer.Tile({
         source: new ol.source.DaumImg()
@@ -27,10 +30,7 @@
           maxZoom: 14,
           maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
         }),
-        controls: [
-          new ol.control.Zoom(),
-          new ol.control.MousePosition()
-        ]
+        controls: ol.control.defaults({})
       });
     </script>
   </body>
