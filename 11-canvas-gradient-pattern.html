@@ -31,35 +31,35 @@
         // pixelRatio to match the renderer's pixel coordinate system.
         var x2 = ol.extent.getWidth(extent) / resolution * pixelRatio
         console.log(ol.extent.getWidth(extent), resolution, pixelRatio, x2)
-        var grad = context.createLinearGradient(0, 0, x2 , 0);
-        grad.addColorStop(0, 'red');
-        grad.addColorStop(1 / 6, 'orange');
-        grad.addColorStop(2 / 6, 'yellow');
-        grad.addColorStop(3 / 6, 'green');
-        grad.addColorStop(4 / 6, 'aqua');
-        grad.addColorStop(5 / 6, 'blue');
-        grad.addColorStop(1, 'purple');
+        var grad = context.createLinearGradient(0, 0, x2 , 0)
+        grad.addColorStop(0, 'red')
+        grad.addColorStop(1 / 6, 'orange')
+        grad.addColorStop(2 / 6, 'yellow')
+        grad.addColorStop(3 / 6, 'green')
+        grad.addColorStop(4 / 6, 'aqua')
+        grad.addColorStop(5 / 6, 'blue')
+        grad.addColorStop(1, 'purple')
         return grad;
       }
 
       // Generate a canvasPattern with two circles on white background
       var pattern = (function() {
-        canvas.width = 11 * pixelRatio;
-        canvas.height = 11 * pixelRatio;
+        canvas.width = 11 * pixelRatio
+        canvas.height = 11 * pixelRatio
         // white background
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = 'white'
+        context.fillRect(0, 0, canvas.width, canvas.height)
         // outer circle
-        context.fillStyle = 'rgba(102, 0, 102, 0.5)';
-        context.beginPath();
-        context.arc(5 * pixelRatio, 5 * pixelRatio, 4 * pixelRatio, 0, 2 * Math.PI);
-        context.fill();
+        context.fillStyle = 'rgba(102, 0, 102, 0.5)'
+        context.beginPath()
+        context.arc(5 * pixelRatio, 5 * pixelRatio, 4 * pixelRatio, 0, 2 * Math.PI)
+        context.fill()
         // inner circle
-        context.fillStyle = 'rgb(55, 0, 170)';
-        context.beginPath();
-        context.arc(5 * pixelRatio, 5 * pixelRatio, 2 * pixelRatio, 0, 2 * Math.PI);
-        context.fill();
-        return context.createPattern(canvas, 'repeat');
+        context.fillStyle = 'rgb(55, 0, 170)'
+        context.beginPath()
+        context.arc(5 * pixelRatio, 5 * pixelRatio, 2 * pixelRatio, 0, 2 * Math.PI)
+        context.fill()
+        return context.createPattern(canvas, 'repeat')
       }());
 
       var fill = new ol.style.Fill();
@@ -73,7 +73,7 @@
 
       var getStackedStyle = function(feature, resolution) {
         var id = feature.get('HCODE')
-        fill.setColor(gradient(feature, resolution)); //pattern
+        fill.setColor(gradient(feature, resolution)); //pattern color에 gradient, pattern을 사용할 수 있다.
         return style;
       }
 

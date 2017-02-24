@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ol.style.Icon.img에 canvas를 사용</title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
+    <script src="ol-daum.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/openlayers.layerswitcher/1.1.0/ol3-layerswitcher.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/openlayers.layerswitcher/1.1.0/ol3-layerswitcher.js"></script>
+
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      var symbol = [[0, 0], [4, 2], [6, 0], [10, 5], [6, 3], [4, 5], [0, 0]];
+      var scale;
+      var scaleFunction = function(coordinate) {
+        return [coordinate[0] * scale, coordinate[1] * scale];
+      };
+
+      var styleCache = {};
+      var styleFunction = function(feature) {
+
+        var magnitude = feature.get('value');
+        var size = parseInt(10 + 40 * (magnitude - 5), 10);
+        scale = size / 10;
+        var style = styleCache[size];
+        if (!style) {
+          var canvas = document.createElement('canvas');
+          var vectorContext = ol.render.toContext( canvas.getContext('2d'), {size: [size, size], pixelRatio: 1});
+          vectorContext.setStyle(new ol.style.Style({
+            fill: new ol.style.Fill({color: 'rgba(255, 153, 0, 0.4)'}),
+            stroke: new ol.style.Stroke({color: 'rgba(255, 204, 0, 0.2)', width: 2})
+          }));
+          vectorContext.drawGeometry(new ol.geom.Polygon([symbol.map(scaleFunction)]));
+          style = new ol.style.Style({
+            image: new ol.style.Icon({
+              img: canvas,
+              imgSize: [size, size],
+              rotation: 1.2
+            })
+          });
+          styleCache[size] = style;
+        }
+        return style;
+      };
+
+
+      var features = [
+        new ol.Feature({
+          geometry: new ol.geom.Point([195063,441898]),
+          value: 20
+        }),
+        new ol.Feature({
+          geometry: new ol.geom.Point([194063,441898]),
+          value: 10
+        })
+      ]
+
+      var source = new ol.source.Vector({features: features})
+      var layer = new ol.layer.Vector({source: source, style: styleFunction});
+
+      var daumImgLayer = new ol.layer.Tile({
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer, layer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 8,
+          maxZoom: 14,
+          maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      });
+
+      var layerSwitcher = new ol.control.LayerSwitcher({})
+      map.addControl(layerSwitcher)
+
+      map.addInteraction(new ol.interaction.KeyboardZoom())
+
+    </script>
+  </body>
+</html>
