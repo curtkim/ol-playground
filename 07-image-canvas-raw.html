@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>image canvas</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="100" height="100" style='border: 1px solid silver'></canvas>
+    <script>
+      var canvas = document.getElementById('canvas')
+      var canvasWidth = canvas.getAttribute('width')
+      var canvasHeight= canvas.getAttribute('height')
+
+      // Draw
+      var ctx= canvas.getContext("2d");
+
+      ctx.scale(1/10, -1/10)
+      ctx.translate(-300,-1100)
+
+      ctx.lineWidth="60"
+      ctx.strokeStyle="red"
+
+      ctx.moveTo(800,100)
+      ctx.lineTo(1300,1100)
+      ctx.stroke()
+    </script>
+  </body>
+</html>

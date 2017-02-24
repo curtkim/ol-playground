@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>don't work</title>
+    <title>image canvas</title>
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
@@ -13,6 +13,7 @@
     <script src="ol-daum.js"></script>
     <style>
       body {margin: 0; padding: 0}
+      #map {width:100%; height: 100%}
     </style>
   </head>
   <body>
@@ -76,23 +77,43 @@
           ctx.beginPath();
           ctx.lineWidth="6";
           ctx.strokeStyle="red";
-          ctx.rect(5,5,290,140);
-          ctx.stroke();
 
+          /*
+          var width = size[0]
+          var height = size[1]
+          ctx.rect( width/2, height/2, 2000, 1000)
+          ctx.stroke()
+          */
+
+          var scale = canvasWidth / (extent[2] - extent[0])
+          ctx.translate(extent[0], extent[1])
+          ctx.scale(scale, -scale)
+          ctx.rect(195063,441898,10000,10000)
+          ctx.stroke()
+
+          /*
+          var rect = [195063,441898, 195063+100,441898+100]
+          ctx.scale()
+          ctx.translate()
+          ctx.rect( rect[0], rect[1], 100, 100)
+          ctx.stroke()
+          */
+
+          /*
           // Green rectangle
           ctx.beginPath();
           ctx.lineWidth="4";
           ctx.strokeStyle="green";
-          ctx.rect(30,30,50,50);
+          ctx.rect(500,500,1030,1030);
           ctx.stroke();
 
           // Blue rectangle
           ctx.beginPath();
           ctx.lineWidth="10";
           ctx.strokeStyle="blue";
-          ctx.rect(50,50,150,80);
+          ctx.rect(1050,1050,1500,800);
           ctx.stroke();
-
+          */
           return canvas
         }
 
