@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ol.layer.Vector + ol.source.Vector</title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.3.2/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.3.2/build/ol.js"></script>
+    <script src="ol-daum.js"></script>
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      var styleFunction = function(feature) {
+        var geometry = feature.getGeometry();
+        var styles = [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: '#ffcc33',
+              width: 2
+            })
+          })
+        ];
+
+        coords = geometry.getCoordinates()
+        start = coords[coords.length-2]
+        end = coords[coords.length-1]
+
+        var dx = end[0] - start[0];
+        var dy = end[1] - start[1];
+        var rotation = Math.atan2(dy, dx);
+        // arrows
+        styles.push(new ol.style.Style({
+          geometry: new ol.geom.Point(end),
+          image: new ol.style.Icon({
+            src: 'https://openlayers.org/en/v4.3.2/examples/data/arrow.png',
+            anchor: [0.75, 0.5],
+            rotateWithView: true,
+            rotation: -rotation
+          })
+        }));
+
+        return styles;
+      }
+
+      var geojsonObject = {
+        'type': 'FeatureCollection',
+        'features': [{
+          'type': 'Feature',
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': [
+              [0, 0], [200000, 0], [100000, 100000]
+            ]
+          }
+        }]
+      };
+
+      var layer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: (new ol.format.GeoJSON()).readFeatures(geojsonObject)
+        }),
+        style: styleFunction
+      });
+
+
+      var daumImgLayer = new ol.layer.Tile({
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer, layer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 0,
+          maxZoom: 14,
+          maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      });
+    </script>
+  </body>
+</html>
