@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ol.layer.Vector + ol.source.Vector</title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
+    <script src="ol-daum.js"></script>
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      var features = []
+      var daumImgLayer = new ol.layer.Tile({
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 0,
+          maxZoom: 14,
+          maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      })
+
+      draw = new ol.interaction.Draw({
+        features: features,
+        type: 'Polygon'
+      })
+      draw.on('drawend', function(event){
+        console.log(event.type)
+        console.log(event.feature)
+        console.log(event.feature.getGeometry())
+        console.log(event.feature.getGeometry().getProperties())
+        console.log(event.feature.getGeometry().getFirstCoordinate())
+      })
+      map.addInteraction(draw)
+    </script>
+  </body>
+</html>
