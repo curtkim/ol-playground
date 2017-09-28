@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>bar chart</title>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
+    <script src="ol-daum.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/ol3-ext@1.0.1/dist/ol3-ext.min.js'></script>
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div class="options">
+      <h2>Options:</h2>
+      Chart type: <select id="graph" onchange="doAnimate();">
+        <option value="pie">pie</option>
+        <option value="pie3D">pie3D</option>
+        <option value="donut">donut</option>
+        <option value="bar">bar</option>
+      </select>
+      &nbsp;&nbsp;
+      Colors scheme:
+      <select id="color" onchange="vector.changed()">
+        <option value="classic">Classic</option>
+        <option value="dark">Dark</option>
+        <option value="pale">Pale</option>
+        <option value="pastel">Pastel</option>
+        <option value="neon">Neon</option>
+        <option value="red,green,blue,magenta">Custom</option>
+      </select>
+    </div>
+
+    <div id="map" class="map"></div>
+    <script>
+      var daumImgLayer = new ol.layer.Tile({
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 5,
+          maxZoom: 14,
+          maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      })
+
+
+      // ol.style.Chart
+      var animation=false;
+      var styleCache={};
+
+      function getFeatureStyle (feature, sel)
+      {
+        var k = $("#graph").val()+"-"+ $("#color").val()+"-"+(sel?"1-":"")+feature.get("data")
+        var style = styleCache[k]
+        if (!style) {
+          var radius = 15
+          // area proportional to data size: s=PI*r^2
+          if ($("#graph").val()!="bar")
+            radius = 8* Math.sqrt (feature.get("size") / Math.PI)
+
+          // Create chart style
+          var c = $("#color").val()
+          styleCache[k] = style = new ol.style.Style({
+            image: new ol.style.Chart({
+              type: $("#graph").val(),
+              radius: (sel ? 1.2 : 1)*radius,
+              offsetY: $("#graph").val()=='pie' ? 0 : (sel?-1.2:-1)*feature.get("radius"),
+              data: feature.get("data") || [10,30,20],
+              colors: /,/.test(c) ? c.split(",") : c,
+              rotateWithView: false,
+              animation: animation,
+              stroke: new ol.style.Stroke({
+                color: $("#color").val()!="neon" ? "#fff":"#000",
+                width: 1
+              }),
+            })
+          })
+        }
+        style.getImage().setAnimation(animation)
+        return [style]
+      }
+
+      // 30 random features with data: array of 4 values
+      function makeFeatures() {
+        var ext = map.getView().calculateExtent(map.getSize())
+        var features=[]
+        for (var i=0; i<30; ++i){
+          var n, nb=0, data=[]
+          for (var k=0; k<4; k++) {
+            n = Math.round(8*Math.random())
+            data.push(n)
+            nb += n
+          }
+          features[i] = new ol.Feature({
+            geometry: new ol.geom.Point([
+              ext[0]+(ext[2]-ext[0])*Math.random(),
+              ext[1]+(ext[3]-ext[1])*Math.random()
+            ]),
+            data: data,
+            size: nb
+          })
+        }
+        return features
+      }
+
+      var vector = new ol.layer.Vector({
+        name: 'Vecteur',
+        source: new ol.source.Vector({ features: makeFeatures() }),
+        // y ordering
+        //renderOrder: ol.ordering.yOrdering(),
+        style: function(f) { return getFeatureStyle(f); }
+      })
+
+      map.addLayer(vector);
+
+      // Animate function
+      function doAnimate(){
+        vector.changed();
+      }
+
+
+    </script>
+  </body>
+</html>
