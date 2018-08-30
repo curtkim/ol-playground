@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>style function</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css" type="text/css">
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+
+    <script src="ol-daum.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/latlon-geohash@1.1.0/latlon-geohash.min.js"></script>
+
+    <style>
+      body {margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      proj4.defs("EPSG:5181","+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
+      ol.proj.proj4.register(proj4)
+
+      console.log(ol.proj.get('EPSG:5181'))
+      console.log( ol.proj.fromLonLat([127,37], ol.proj.get('EPSG:5181')) )
+
+
+      var customStyleFunction = function(feature, resolution) {
+        //console.log(feature.get('HCODE'))
+        return [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: 'blue',
+              width: 2
+            }),
+            fill: new ol.style.Fill({
+              color: '#'+Math.floor(Math.random()*16777215).toString(16)
+            })
+          })
+        ]
+      }
+
+      var list = ["wydhdj", "wydk13", "wyd8gv", "wy4pzp", "wy6x1c", "wy6wcq", "wydurv", "wy6w9f", "wydmds", "wy7frt", "wyd8th", "wy4wv1", "wy7fph", "wy6204", "wydm8v", "wydmcb", "wvcyxv", "wydq6v", "wy6wdt", "wydj7d", "wy7kn6", "wy781n", "wy5z86", "wydj1y", "wy7s0f", "wyd3w4", "wydkuk", "wy77yg", "wy7b51", "wyd77d", "wyd7g1", "wydm6s", "wyd8g6", "wyduxc", "wydq25", "wy67ue", "wy7uz7", "wyduqv", "wydj4g", "wydk1f", "wy7fxz", "wydhme", "wy6wc9", "wyk1cn", "wy6hes", "wydjkc", "wyd7ex", "wy7fmd", "wvcyw8", "wydkvx", "wydm6z", "wydmc2", "wyd762", "wydux5", "wydj50", "wydjrj", "wy4wyv", "wydjqh", "wydurk", "wydh72", "wydjs4", "wy7btq", "wydmkm", "wy7b3q", "wy6209", "wydmbc", "wydm4y", "wy4vf1", "wyd8mn", "wy6wc3", "wydk7d", "wyd8kr", "wydkhu", "wydhrb", "wy72rc", "wydmeq", "wy7m6m", "wyd8s0", "wydm9j", "wydm8h", "wydjke", "wy77z3", "wy6wcn", "wy4veh", "wydmeb", "wydmt6", "wyd3jx", "wy4pyq", "wydmf2", "wy60pm", "wydkex", "wy7fr1", "wydje9", "wyd7dy", "wy1vuj", "wvcy14", "wy60p3", "wydjsn", "wy4vcc", "wy4rbm", "wydkbc", "wydmjm", "wydmk5", "wyd7ek", "wy4pvj", "wyd7fm", "wydmes", "wy6wsn", "wy6w92", "wyd8s2", "wvcy5d", "wvcy13", "wyd7y1", "wyd7yc", "wydj7b", "wydmbf", "wydjky", "wydqq6", "wydjwh", "wyd77r", "wy77gr", "wydm9e", "wydmb4", "wydnhw", "wy60pk", "wydqj8", "wy60pb", "wydm0m", "wyd8k4", "wy5zct", "wydk49", "wydm7s", "wydm6y", "wy7b97", "wydjr6", "wy4pzp", "wy9cjm", "wy4pvh", "wydjjx", "wydmds", "wy78ze", "wydmwh", "wy7k4k", "wydhq1", "wy5z8g", "wydjde", "wydq52", "wydjry", "wydhnw", "wykhb8", "wyd8ms", "wyd77t", "wydmk8", "wyeh24", "wydjwj", "wydqhx", "wy67sr", "wyd3mj", "wy7je8", "wydhpj", "wy4ycf", "wydmgc", "wy78z5", "wydksq", "wydjr8", "wydmg1", "wydjgt", "wydur6", "wydngp", "wydmd3", "wyd73m", "wvcvhv", "wy7fq2", "wyd7ss", "wydmcs", "wy7b4h", "wy67v5", "wy6x77", "wydm4n", "wydm60", "wy7m2c", "wyewv7", "wydk9x", "wydn7s", "wydjmq", "wy5xxn", "wy4pze", "wy6wex", "wydkkr", "wydhmw", "wydjwd", "wydjmy", "wvcyw0", "wyd37z", "wydmgt", "wydneu", "wydjpn", "wy7knb", "wyewvx", "wy7uyy", "wydm63", "wy6rxm", "wy4pzd", "wydq43", "wydj7x", "wydqqu", "wydm8h", "wydm3n", "wy60pv", "wy60r8", "wydq3j", "wy77ys", "wydm8z", "wydm6v", "wyd5r8", "wy4vdv", "wy7kn2", "wyg3mb", "wydrek", "wy704h", "wydm6e", "wydjhy", "wvcvhm", "wyd6mm", "wy78r9", "wydm6m", "wy6207", "wydqev", "wydhvr", "wydj14", "wyewst", "wydm3q", "wydjx8", "wy60j7", "wydm6w", "wyd7es", "wyd8mp", "wyd37d", "wydnkt", "wydmes", "wy4pyx", "wy67sm", "wydmsf", "wydm7h", "wydqdu", "wy7knc", "wy7frj", "wydm92", "wydqsj", "wyd7fv", "wydj55", "wydm38", "wydm8c", "wyd8k3", "wy7kq2", "wydmd8", "wy77ym", "wy7b4m", "wydjrn", "wydkke", "wydnkf", "wvcyw3", "wydkjm", "wyd7ds", "wy7b21", "wy7kp7", "wy7fnt", "wy77v6", "wy4pyv", "wy6nr7", "wy7guw", "wy67sk", "wy5q4j", "wydqf9", "wydmk0", "wy67ss", "wydm9x", "wydk4t", "wvcyqp", "wyd7vg", "wydk3r", "wydm56", "wy7gg4", "wy6x8j", "wydm6z", "wyd7se", "wy5xtt", "wy5z86", "wy7kmn", "wydjwb", "wy6h6e", "wydme4", "wydqe0", "wy7fq3", "wydutu", "wvcywc", "wydjwj", "wydhkh", "wy6w9w", "wy77yg", "wy7guj", "wydm6s", "wydmgc", "wyewsp", "wydhvx", "wydk2q", "wydj1r", "wydmv7", "wy7bs3", "wy7b59", "wydhcr", "wydmfq", "wy782q", "wy67f6", "wydmgs", "wy7fpr", "wydj7m", "wydm3d", "wydhgz", "wyg3q4", "wydj5q", "wydj6s", "wydm9r", "wydjpm", "wy7m2c", "wye7ed", "wyd7gt", "wyewv7", "wydjqq", "wydksr", "wy6mt1", "wydhnq", "wy6rxd", "wydq3j", "wydjr9", "wvcv73", "wydmdn", "wy78t2", "wy7fr7", "wydnk7", "wydm7e", "wydm4g", "wy6weg", "wydj6t", "wydm3m", "wydkhc", "wydmkc", "wyexhj", "wy7b1m", "wy60j9", "wyd3k7", "wy4vcu", "wydkh3", "wy6hds", "wydjwm", "wy4pyr", "wydjsm", "wydj51", "wydu0h", "wydm76", "wy4rbn", "wydm2n", "wydnks", "wydqs8", "wy4vdv", "wydmf2", "wy60pm", "wy78p5", "wydm6m", "wydqg8", "wy7edy", "wydkbc", "wydkyy", "wydm4s", "wydmu1", "wydj1v", "wydm77", "wyd3mw", "wy7fnz", "wy7b1w", "wy6w9t", "wydkb1", "wydux6", "wydm7h", "wydm6f", "wydmth", "wvcy13", "wydj5m", "wydmt0", "wy7b56", "wydnp5", "wyd7fn", "wy60pc", "wydjwh", "wydm6g", "wy7knf", "wydhyr", "wydm9w", "wyd8gv", "wyd7fw", "wydq51", "wydmee", "wyd7e3", "wydj4v", "wydj68", "wydj7c", "wy6wds", "wydk8b", "wydmb5", "wydj6q", "wy77vh", "wydm5n", "wydm32", "wydmjh", "wy5zbs", "wydk1v", "wydksx", "wydhfg", "wydq5t", "wydmdd", "wydks6", "wy782h", "wydj57", "wydhqu", "wydmcj", "wy4pym", "wy7uzj", "wydmk8", "wydmfx", "wyd8sg", "wydhff", "wy7fng", "wydktq", "wydjtv", "wy77v0", "wyd3uj", "wy4pyd", "wydjk2", "wydmfq", "wy4pzn", "wy72w9", "wyewyk", "wy7fjn", "wy4wug", "wydk4d", "wydm1h", "wydhx1", "wydku2", "wydm74", "wydqu2", "wydm1r", "wy6wct", "wydmdn", "wydm0x", "wydqem", "wy7k50", "wyd70p", "wy704n", "wydmsc", "wydj50", "wydhvp", "wydk83", "wydqdz", "wy782k", "wydfr6", "wy65hp", "wy6wfk", "wydhfj", "wy72js", "wydmmq", "wydnk0", "wy4wvg", "wydhg2", "wydjm8", "wydmj9", "wydjhx", "wydm8h", "wydqh9", "wydurj", "wy7ebt", "wydjpg", "wydmup", "wy60nr", "wydm76", "wy4r3z", "wy67hq", "wydfr7", "wy4pz1", "wydj1d", "wydjhy", "wvcykx", "wydmer", "wvfnf6", "wyd3t2", "wy6wdx", "wvcy14", "wydj7p", "wy4vcc", "wyd8g2", "wydkyy", "wydjpr", "wydurc", "wydmjm", "wyd87e", "wydjrv", "wydmk5", "wy60p2", "wy72wg", "wydupp", "wyg3q0", "wy6wdy", "wvcy5d", "wvcym1", "wydq4f", "wy6k2r", "wydk4p", "wydm0j", "wydk1j"]
+
+      var features = []
+      for(var i = 0; i < list.length; i++){
+        var bound = Geohash.bounds(list[i])
+        var sw = ol.proj.fromLonLat([bound.sw.lon, bound.sw.lat], ol.proj.get('EPSG:5181'))
+        var ne = ol.proj.fromLonLat([bound.ne.lon, bound.ne.lat], ol.proj.get('EPSG:5181'))
+        var se = [ne[0], sw[1]]
+        var nw = [sw[0], ne[1]]
+
+        features.push (new ol.Feature({
+          geometry: new ol.geom.Polygon([[
+            sw, se, ne, nw, sw
+          ]]),
+          value: 200
+        }))
+      }
+
+      var vector = new ol.layer.Vector({
+        title: 'vector',
+        source: new ol.source.Vector({
+          features: features
+        }),
+        style: customStyleFunction,
+        opacity: 0.7
+      });
+
+      var daumImgLayer = new ol.layer.Tile({
+        title: 'daum 2d',
+        source: new ol.source.DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer, vector
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 7,
+          maxZoom: 14,
+          maxResolution: 2048, // 14level(zoom=0)에서 1px은 2048m와 같다
+          projection: ol.proj.get('EPSG:5181')
+        }),
+        controls: [
+          new ol.control.Zoom(),
+          new ol.control.MousePosition()
+        ]
+      });
+
+      map.addInteraction(new ol.interaction.KeyboardZoom())
+    </script>
+  </body>
+</html>
