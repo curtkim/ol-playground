@@ -2,10 +2,9 @@
 <html>
   <head>
     <title>hover</title>
-    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
-    <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
-    <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css" type="text/css">
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/openlayers.layerswitcher/1.1.0/ol3-layerswitcher.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/openlayers.layerswitcher/1.1.0/ol3-layerswitcher.js"></script>
@@ -19,6 +18,7 @@
     <div id="map" class="map"></div>
     <script>
       proj4.defs("EPSG:5181","+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+      ol.proj.proj4.register(proj4)
 
       var styles = [
         new ol.style.Style({
@@ -37,7 +37,7 @@
         source: new ol.source.Vector({
           url: 'korea-region-topo.json',
           format: new ol.format.TopoJSON({
-            defaultDataProjection: ol.proj.get('EPSG:5181')
+            dataProjection: ol.proj.get('EPSG:5181')
           })
         }),
         style: styles
@@ -66,11 +66,7 @@
         ]
       });
 
-      var layerSwitcher = new ol.control.LayerSwitcher({})
-      map.addControl(layerSwitcher)
-
       map.addInteraction(new ol.interaction.KeyboardZoom())
-
 
       function onMouseMove(browserEvent) {
         var coordinate = browserEvent.coordinate;

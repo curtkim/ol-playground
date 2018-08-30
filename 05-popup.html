@@ -2,30 +2,68 @@
 <html>
   <head>
     <title>Popup</title>
-    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.14/proj4.js"></script>
-    <link rel="stylesheet" href="https://openlayers.org/en/v4.0.1/css/ol.css" type="text/css">
-    <script src="https://openlayers.org/en/v4.0.1/build/ol.js"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/openlayers.layerswitcher/1.1.0/ol3-layerswitcher.css" type="text/css">
-    <script src="https://cdn.jsdelivr.net/openlayers.layerswitcher/1.1.0/ol3-layerswitcher.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css" type="text/css">
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
 
     <script src="ol-daum.js"></script>
     <style>
       body {margin: 0; padding: 0}
-      .popover-content {
-        min-width: 180px;
+
+      .ol-popup {
+        position: absolute;
+        background-color: white;
+        -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+        bottom: 12px;
+        left: -50px;
+        min-width: 280px;
+      }
+      .ol-popup:after, .ol-popup:before {
+        top: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      .ol-popup:after {
+        border-top-color: white;
+        border-width: 10px;
+        left: 48px;
+        margin-left: -10px;
+      }
+      .ol-popup:before {
+        border-top-color: #cccccc;
+        border-width: 11px;
+        left: 48px;
+        margin-left: -11px;
+      }
+      .ol-popup-closer {
+        text-decoration: none;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+      }
+      .ol-popup-closer:after {
+        content: "✖";
       }
     </style>
   </head>
   <body>
     <div id="map" class="map"></div>
-    <div id="popup" title="Welcome to ol3"></div>
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
+
     <script>
       proj4.defs("EPSG:5181","+proj=tmerc +lat_0=38 +lon_0=127 +k=1 +x_0=200000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+      ol.proj.proj4.register(proj4)
 
       var styles = [
         new ol.style.Style({
@@ -41,9 +79,12 @@
 
       var vector = new ol.layer.Vector({
         title: 'vector',
-        source: new ol.source.Vector({url: 'korea-region-topo.json', format: new ol.format.TopoJSON({
-          defaultDataProjection: ol.proj.get('EPSG:5181')
-        })}),
+        source: new ol.source.Vector({
+          url: 'korea-region-topo.json',
+          format: new ol.format.TopoJSON({
+            dataProjection: ol.proj.get('EPSG:5181')
+          })
+        }),
         style: styles
       });
 
@@ -70,31 +111,44 @@
         ]
       });
 
-      var layerSwitcher = new ol.control.LayerSwitcher({})
-      map.addControl(layerSwitcher)
 
-      // Popup showing the position the user clicked
-      var popup = new ol.Overlay({
-        element: document.getElementById('popup')
-      })
-      map.addOverlay(popup)
+      /**
+       * Elements that make up the popup.
+       */
+      var container = document.getElementById('popup');
+      var content = document.getElementById('popup-content');
+      var closer = document.getElementById('popup-closer');
+
+      /**
+       * Create an overlay to anchor the popup to the map.
+       */
+      var overlay = new ol.Overlay({
+        element: container,
+        autoPan: true,
+        autoPanAnimation: {
+          duration: 250
+        }
+      });
+
+      /**
+       * Add a click handler to hide the popup.
+       * @return {boolean} Don't follow the href.
+       */
+      closer.onclick = function() {
+        overlay.setPosition(undefined);
+        closer.blur();
+        return false;
+      };
+      map.addOverlay(overlay)
 
 
       var selectSingleClick = new ol.interaction.Select()
       map.addInteraction(selectSingleClick)
       selectSingleClick.on('select', function(e) {
         var coordinate = e.mapBrowserEvent.coordinate
-        var element = popup.getElement()
+        overlay.setPosition(coordinate)
         var feature = e.target.getFeatures().item(0)
-        $(element).popover('destroy')
-        popup.setPosition(coordinate)
-        $(element).popover({
-          'placement': 'top',
-          'animation': false,
-          'html': true,
-          'content': '<p>The location you clicked was:</p><div>' + feature.get('HCODE') + '</div>'
-        });
-        $(element).popover('show');
+        content.innerHTML = '<p>You clicked here:</p><code>' + feature.get('HCODE') +'</code>';
       })
     </script>
   </body>
