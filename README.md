@@ -1,1 +1,1 @@
-http://curtkim.github.io/ol3-playground/
+http://curtkim.github.io/ol-playground/
