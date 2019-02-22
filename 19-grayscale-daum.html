@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Daum Image Tile</title>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css" type="text/css">
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+    <script src="ol-daum.js"></script>
+    <style>
+      body {margin: 0; padding: 0}
+      #map:focus {
+        outline: #4A74A8 solid 0.15em;
+      }
+    </style>
+  </head>
+  <body>
+    <xmp>/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security --user-data-dir=/tmp</xmp>
+    <div id="map" class="map" tabindex="0"></div>
+    <div id="mouse-position"></div>
+    <div id="mapcanvas" style="width:400px;height:600px;border:1px solid black;" class="mapcanvas">
+      <canvas id="myCanvas">
+        Your browser does not support the HTML5 canvas tag.
+      </canvas>
+    </div>
+
+
+    <script type="text/javascript">
+    // function applies greyscale to every pixel in canvas
+    function greyscale(context) {
+      var canvas = context.canvas;
+      var width = canvas.width;
+      var height = canvas.height;
+      //console.log('width: ' + width);
+      //console.log('height: ' + height);
+
+
+      var inputData = context.getImageData(0, 0, width, height).data;
+      //console.log('inputData.length: ' + inputData.length);
+
+
+      var canvas = document.getElementById('myCanvas');
+      var ctx = canvas.getContext('2d');
+      ctx.canvas.width  = width;
+      ctx.canvas.height = height;
+      ctx.fillStyle = "rgba(0, 0, 0, 0)"
+      var myImageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
+      var d = myImageData.data;
+
+      for(i=0; i<inputData.length; i += 4){
+
+        var r = inputData[i];
+        var g = inputData[i + 1];
+        var b = inputData[i + 2];
+        // CIE luminance for the RGB
+        var v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        d[i+0] = v; // Red
+        d[i+1] = v; // Green
+        d[i+2] = v; // Blue
+        d[i+3] = 255; // Alpha
+      }
+      //ctx.putImageData(myImageData,0,0);
+      // overwrite
+      context.putImageData(myImageData,0,0);
+    }
+
+    </script>
+
+
+    <script>
+      function is_high_resolution_screen() {
+        return window.devicePixelRatio > 1;
+      }
+
+      var resolutions = [];
+      for(var i = 14; i >= 1; i--)
+        resolutions.push(Math.pow(2, i-3))
+      var maxExtent = [-30000-Math.pow(2,19)*2, -60000-Math.pow(2,19), -30000+Math.pow(2,19)*3, -60000+Math.pow(2, 19)*3];
+      var tilePixelRatio = is_high_resolution_screen() ? 2 : 1;
+
+      var daumImgLayer = new ol.layer.Tile({
+        source: new DaumImg()
+      })
+
+      var map = new ol.Map({
+        layers: [
+          daumImgLayer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [195063,441898],
+          zoom: 7,
+          maxZoom: 14,
+          maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
+        }),
+        controls: ol.control.defaults({}).extend([
+          new ol.control.MousePosition()
+        ])
+      });
+
+      //Apply a filter on "postcompose" events.
+      daumImgLayer.on('postcompose', function(event) {
+        greyscale(event.context);
+      });
+    </script>
+  </body>
+</html>

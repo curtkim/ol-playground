@@ -14,6 +14,7 @@
   </head>
   <body>
     <div id="map" class="map" tabindex="0"></div>
+    <div id="mouse-position"></div>
     <script>
       function is_high_resolution_screen() {
         return window.devicePixelRatio > 1;
@@ -40,7 +41,9 @@
           maxZoom: 14,
           maxResolution: 2048 // 14level(zoom=0)에서 1px은 2048m와 같다
         }),
-        controls: ol.control.defaults({})
+        controls: ol.control.defaults({}).extend([
+          new ol.control.MousePosition()
+        ])
       });
     </script>
   </body>
